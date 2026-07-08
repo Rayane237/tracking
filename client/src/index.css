@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: #15171c;
+  background: #f5f6f8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(229, 231, 235, 0.9);
+}
+
+.leaflet-container {
+  min-height: 420px;
+  width: 100%;
+  border-radius: 24px;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.map-marker {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  color: white;
+  font-weight: 800;
+  box-shadow: 0 14px 30px rgba(8, 9, 11, 0.24);
+  border: 3px solid white;
+}
+
+.map-marker-red {
+  background: #e30613;
+}
+
+.map-marker-dark {
+  background: #111827;
+}
+
+.map-marker-green {
+  background: #16a34a;
+}
+
+.premium-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.premium-scrollbar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}
+
+.inputStyle {
+    @apply rounded-xl 
+    bg-white/10 
+    p-3 
+    text-white 
+    outline-none 
+    placeholder:text-slate-400 
+    border 
+    border-white/10;
+  }
