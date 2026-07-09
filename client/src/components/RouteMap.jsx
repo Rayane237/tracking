@@ -111,7 +111,7 @@ function createShipIcon({ image, size = 46 }) {
         display:flex;
         flex-direction:column;
         align-items:center;
-        transform:translateY(-58px);
+        transform:translateY(-28px);
       ">
         <div style="
           width:${size}px;
@@ -137,8 +137,8 @@ function createShipIcon({ image, size = 46 }) {
         "></div>
       </div>
     `,
-    iconSize: [86, 124],
-    iconAnchor: [43, 124],
+    iconSize: [86, 94],
+    iconAnchor: [43, 94],
   });
 }
 
@@ -229,7 +229,7 @@ export default function RouteMap({ order }) {
           <Polyline
             positions={createSeaRoute(completedRoutePoints)}
             pathOptions={{
-              color: "#7f1d1d",
+              color: "#84cc16",
               weight: 5,
               opacity: 0.95,
             }}
