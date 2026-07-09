@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+// Use environment variable or fallback to production Railway URL
+export const API_URL = import.meta.env.VITE_API_URL || 'https://dubai-global-express-api-production.up.railway.app/api';
 
 const http = axios.create({
   baseURL: API_URL,
