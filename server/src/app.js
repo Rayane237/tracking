@@ -22,8 +22,8 @@ const uploadDir = process.env.UPLOAD_DIR || 'uploads';
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  "http://192.168.136.1:5174"
-  "https://dubai-global-express.netlify.app"
+  "http://192.168.136.1:5174",
+  "https://dubai-global-express.netlify.app",
 ];
 
 app.use(
