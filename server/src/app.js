@@ -34,7 +34,11 @@ const getCorsOptions = () => {
       "http://192.168.136.1:5174"
     ];
 
-    if (devOrigins.includes(origin)) {
+    const productionOrigins = [
+      "https://dubaiglobal-suivi.vercel.app"
+    ];
+
+    if (devOrigins.includes(origin) || productionOrigins.includes(origin)) {
       return callback(null, true);
     }
 
