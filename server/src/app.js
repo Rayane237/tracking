@@ -19,6 +19,21 @@ const app = express();
 
 const uploadDir = process.env.UPLOAD_DIR || 'uploads';
 
+const isAllowedHostedOrigin = (origin) => {
+  try {
+    const { hostname } = new URL(origin);
+
+    return (
+      hostname === 'dubaiglobal-suivi.vercel.app' ||
+      hostname.endsWith('.vercel.app') ||
+      hostname.endsWith('.railway.app') ||
+      hostname.endsWith('.netlify.app')
+    );
+  } catch {
+    return false;
+  }
+};
+
 // CORS configuration - Accept both development and production origins
 const getCorsOptions = () => {
   const origin = (origin, callback) => {
@@ -38,15 +53,12 @@ const getCorsOptions = () => {
       "https://dubaiglobal-suivi.vercel.app"
     ];
 
-    if (devOrigins.includes(origin) || productionOrigins.includes(origin)) {
+    if (
+      devOrigins.includes(origin) ||
+      productionOrigins.includes(origin) ||
+      isAllowedHostedOrigin(origin)
+    ) {
       return callback(null, true);
-    }
-
-    // Production origins - Accept any vercel.app, railway.app, netlify.app
-    if (process.env.NODE_ENV === 'production') {
-      if (origin.includes('vercel.app') || origin.includes('railway.app') || origin.includes('netlify.app')) {
-        return callback(null, true);
-      }
     }
 
     // Accept CLIENT_URL if explicitly set
