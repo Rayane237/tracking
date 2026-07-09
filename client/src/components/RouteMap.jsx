@@ -93,6 +93,45 @@ function createMapIcon({ image, title, subtitle, badge, size = 40 }) {
   });
 }
 
+function createShipIcon({ image, size = 46 }) {
+  return L.divIcon({
+    className: "",
+    html: `
+      <div style="
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        transform:translateY(-10px);
+      ">
+        <div style="
+          width:${size}px;
+          height:${size}px;
+          display:grid;
+          place-items:center;
+          background:linear-gradient(180deg,#ffffff 0%,#eef6ff 100%);
+          border:2px solid #0B1F3A;
+          border-radius:999px;
+          box-shadow:0 8px 18px rgba(11,31,58,.28);
+        ">
+          <div style="width:${size - 12}px;height:${size - 12}px;">
+            ${image}
+          </div>
+        </div>
+        <div style="
+          width:0;
+          height:0;
+          border-left:6px solid transparent;
+          border-right:6px solid transparent;
+          border-top:8px solid #0B1F3A;
+          filter:drop-shadow(0 2px 2px rgba(0,0,0,.18));
+        "></div>
+      </div>
+    `,
+    iconSize: [70, 68],
+    iconAnchor: [35, 68],
+  });
+}
+
 function createSeaRoute(points) {
   const result = [];
 
@@ -189,14 +228,10 @@ export default function RouteMap({ order }) {
 
         <Marker
           position={shipPosition}
-          zIndexOffset={100}
-          icon={createMapIcon({
+          zIndexOffset={300}
+          icon={createShipIcon({
             image: SHIP_ICON,
-            title: order.shipment?.vesselName || "Navire",
-            subtitle: order.shipment?.vesselNumber
-              ? `IMO ${order.shipment.vesselNumber}`
-              : "",
-            size: 65,
+            size: 46,
           })}
         />
 
