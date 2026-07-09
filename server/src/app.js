@@ -19,12 +19,49 @@ const app = express();
 
 const uploadDir = process.env.UPLOAD_DIR || 'uploads';
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://192.168.136.1:5174",
-  "https://dubai-global-express.netlify.app",
-];
+// CORS configuration - Accept both development and production origins
+const getCorsOptions = () => {
+  const origin = (origin, callback) => {
+    // Allow no origin (mobile apps, curl requests)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Development origins
+    const devOrigins = [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://192.168.136.1:5174"
+    ];
+
+    if (devOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Production origins - Accept any vercel.app, railway.app, netlify.app
+    if (process.env.NODE_ENV === 'production') {
+      if (origin.includes('vercel.app') || origin.includes('railway.app') || origin.includes('netlify.app')) {
+        return callback(null, true);
+      }
+    }
+
+    // Accept CLIENT_URL if explicitly set
+    if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) {
+      return callback(null, true);
+    }
+
+    // Reject other origins
+    console.warn(`⚠️ CORS blocked origin: ${origin}`);
+    callback(new Error('Not allowed by CORS'));
+  };
+
+  return {
+    origin,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  };
+};
 
 app.use(
   helmet({
@@ -33,16 +70,7 @@ app.use(
 );
 
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true
-  })
+  cors(getCorsOptions())
 );
 
 app.use(express.json({ limit: '2mb' }));
