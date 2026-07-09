@@ -4,22 +4,32 @@ import { MapContainer, Marker, Polyline, TileLayer } from "react-leaflet";
 const SHIP_ICON = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
-    <linearGradient id="sea" x1="0" x2="0" y2="1">
-      <stop stop-color="#0077C8"/>
-      <stop offset="1" stop-color="#003B73"/>
+    <linearGradient id="hull" x1="0" x2="1">
+      <stop stop-color="#07192f"/>
+      <stop offset=".55" stop-color="#102f55"/>
+      <stop offset="1" stop-color="#07192f"/>
     </linearGradient>
+    <linearGradient id="deck" x1="0" x2="0" y2="1">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dbe8f5"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#0B1F3A" flood-opacity=".25"/>
+    </filter>
   </defs>
-  <path d="M15 70 L105 70 L90 95 Q60 110 30 95 Z" fill="#0B1F3A"/>
-  <path d="M25 82 Q60 95 95 82" stroke="#E30613" stroke-width="5" fill="none"/>
-  <rect x="42" y="35" width="38" height="35" rx="3" fill="white"/>
-  <rect x="50" y="22" width="22" height="15" fill="#D9EAF7"/>
-  <rect x="55" y="27" width="5" height="5" fill="#0057B8"/>
-  <rect x="63" y="27" width="5" height="5" fill="#0057B8"/>
-  <rect x="30" y="52" width="12" height="12" fill="#0057B8"/>
-  <rect x="45" y="52" width="12" height="12" fill="#E30613"/>
-  <rect x="60" y="52" width="12" height="12" fill="#F5A623"/>
-  <rect x="75" y="52" width="12" height="12" fill="#0057B8"/>
-  <path d="M10 100 Q30 90 50 100 T90 100 T120 100" stroke="#00AEEF" stroke-width="5" fill="none"/>
+  <g filter="url(#shadow)">
+    <path d="M12 69 H108 L98 91 H29 C22 91 17 86 15 80 Z" fill="url(#hull)"/>
+    <path d="M22 78 H98" stroke="#e30613" stroke-width="4" stroke-linecap="round"/>
+    <path d="M34 51 H78 V69 H28 V57 C28 54 31 51 34 51 Z" fill="url(#deck)"/>
+    <path d="M52 34 H86 V69 H52 Z" fill="#f8fbff"/>
+    <path d="M60 22 H82 V36 H60 Z" fill="#e9f3fb"/>
+    <path d="M63 27 H68 M73 27 H78 M59 42 H65 M69 42 H75 M79 42 H85" stroke="#0b5fa5" stroke-width="4" stroke-linecap="round"/>
+    <rect x="31" y="57" width="11" height="10" fill="#0057b8"/>
+    <rect x="45" y="57" width="11" height="10" fill="#e30613"/>
+    <rect x="59" y="57" width="11" height="10" fill="#f5a623"/>
+    <rect x="73" y="57" width="11" height="10" fill="#0057b8"/>
+    <path d="M15 96 C28 89 41 103 54 96 C67 89 80 103 93 96 C101 92 108 92 115 96" stroke="#00aeef" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>
 </svg>
 `;
 
@@ -101,34 +111,34 @@ function createShipIcon({ image, size = 46 }) {
         display:flex;
         flex-direction:column;
         align-items:center;
-        transform:translateY(-10px);
+        transform:translateY(-58px);
       ">
         <div style="
           width:${size}px;
           height:${size}px;
           display:grid;
           place-items:center;
-          background:linear-gradient(180deg,#ffffff 0%,#eef6ff 100%);
-          border:2px solid #0B1F3A;
-          border-radius:999px;
-          box-shadow:0 8px 18px rgba(11,31,58,.28);
+          background:rgba(255,255,255,.94);
+          border:1px solid rgba(11,31,58,.18);
+          border-radius:14px;
+          box-shadow:0 10px 22px rgba(11,31,58,.25);
         ">
-          <div style="width:${size - 12}px;height:${size - 12}px;">
+          <div style="width:${size - 8}px;height:${size - 8}px;">
             ${image}
           </div>
         </div>
         <div style="
           width:0;
           height:0;
-          border-left:6px solid transparent;
-          border-right:6px solid transparent;
-          border-top:8px solid #0B1F3A;
+          border-left:7px solid transparent;
+          border-right:7px solid transparent;
+          border-top:10px solid #0B1F3A;
           filter:drop-shadow(0 2px 2px rgba(0,0,0,.18));
         "></div>
       </div>
     `,
-    iconSize: [70, 68],
-    iconAnchor: [35, 68],
+    iconSize: [86, 124],
+    iconAnchor: [43, 124],
   });
 }
 
@@ -228,10 +238,10 @@ export default function RouteMap({ order }) {
 
         <Marker
           position={shipPosition}
-          zIndexOffset={300}
+          zIndexOffset={900}
           icon={createShipIcon({
             image: SHIP_ICON,
-            size: 46,
+            size: 58,
           })}
         />
 
