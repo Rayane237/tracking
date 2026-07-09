@@ -14,6 +14,42 @@ async function getUniqueTrackingCode() {
   return trackingCode;
 }
 
+function getLastCompletedPort(route = []) {
+  return [...route]
+    .reverse()
+    .find((port) => (
+      port.completed &&
+      port.name &&
+      port.coordinates &&
+      port.coordinates.lat !== undefined &&
+      port.coordinates.lng !== undefined &&
+      !Number.isNaN(Number(port.coordinates.lat)) &&
+      !Number.isNaN(Number(port.coordinates.lng))
+    ));
+}
+
+function applyRouteProgress(payload) {
+  const lastCompletedPort = getLastCompletedPort(payload.route);
+
+  if (!lastCompletedPort) {
+    return payload;
+  }
+
+  return {
+    ...payload,
+    currentLocation: {
+      label: lastCompletedPort.country
+        ? `${lastCompletedPort.name}, ${lastCompletedPort.country}`
+        : lastCompletedPort.name,
+      coordinates: {
+        lat: Number(lastCompletedPort.coordinates.lat),
+        lng: Number(lastCompletedPort.coordinates.lng),
+      },
+      updatedAt: new Date(),
+    },
+  };
+}
+
 export const listOrders = asyncHandler(async (req, res) => {
   const { q = '', status = '' } = req.query;
   const filters = {};
@@ -45,16 +81,16 @@ export const getOrder = asyncHandler(async (req, res) => {
 
 export const createOrder = asyncHandler(async (req, res) => {
   const trackingCode = req.body.trackingCode || (await getUniqueTrackingCode());
-  const order = await Order.create({
+  const order = await Order.create(applyRouteProgress({
     ...req.body,
     trackingCode: trackingCode.toUpperCase(),
-  });
+  }));
 
   res.status(201).json({ order });
 });
 
 export const updateOrder = asyncHandler(async (req, res) => {
-  const order = await Order.findByIdAndUpdate(req.params.id, req.body, {
+  const order = await Order.findByIdAndUpdate(req.params.id, applyRouteProgress(req.body), {
     new: true,
     runValidators: true,
   });
@@ -136,4 +172,3 @@ export const uploadVehiclePhotos = asyncHandler(async (req, res) => {
 export const generateCode = asyncHandler(async (_req, res) => {
   res.json({ trackingCode: await getUniqueTrackingCode() });
 });
-

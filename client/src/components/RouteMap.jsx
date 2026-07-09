@@ -287,6 +287,15 @@ return result;
 }
 
 
+function getLastCompletedPort(ports){
+
+
+return [...ports]
+.reverse()
+.find(port=>Boolean(port.completed));
+
+
+}
 
 
 
@@ -367,6 +376,11 @@ const routePoints=ports.map(
 port=>port.position
 
 );
+
+const lastCompletedPort=getLastCompletedPort(ports);
+
+
+const shipPosition=lastCompletedPort?.position || current;
 
 
 
@@ -511,7 +525,7 @@ size:38
 <Marker
 
 
-position={current}
+position={shipPosition}
 
 
 icon={createMapIcon({
