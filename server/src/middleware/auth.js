@@ -23,3 +23,11 @@ export const protect = asyncHandler(async (req, res, next) => {
   next();
 });
 
+export const admin = (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error('Accès administrateur requis.');
+  }
+  next();
+};
+

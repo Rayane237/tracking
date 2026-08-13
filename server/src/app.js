@@ -10,6 +10,7 @@ import authRoutes from './routes/authRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import publicRoutes from './routes/publicRoutes.js';
 import statsRoutes from './routes/statsRoutes.js';
+import portRoutes from './routes/portRoutes.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -118,6 +119,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/track', publicRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/ports', portRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
