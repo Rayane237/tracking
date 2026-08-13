@@ -1,6 +1,7 @@
 import L from "leaflet";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Polyline, TileLayer, Popup } from "react-leaflet";
+import { ports as allPorts } from "../data/port.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import http from "../api/http.js";
 
@@ -167,7 +168,7 @@ function getLastCompletedPortIndex(ports) {
   );
 }
 
-export default function RouteMap({ order }) {
+export default function RouteMap({ order, showAllPorts = false }) {
   if (!order?.currentLocation?.coordinates) {
     return null;
   }
@@ -197,6 +198,27 @@ export default function RouteMap({ order }) {
       position: [Number(point.coordinates.lat), Number(point.coordinates.lng)],
     }));
 
+  // Jebel Ali est le point de départ hors Afrique : il ne fait pas partie
+  // de la liste des ports africains proposée au client.
+  const africanPorts = useMemo(
+    () =>
+      allPorts
+        .filter(
+          (port) =>
+            !port.region &&
+            port.coordinates &&
+            port.coordinates.lat !== "" &&
+            port.coordinates.lng !== "" &&
+            !Number.isNaN(Number(port.coordinates.lat)) &&
+            !Number.isNaN(Number(port.coordinates.lng))
+        )
+        .map((port) => ({
+          ...port,
+          position: [Number(port.coordinates.lat), Number(port.coordinates.lng)],
+        })),
+    []
+  );
+
   const routePoints = ports.map((port) => port.position);
   const lastCompletedPortIndex = getLastCompletedPortIndex(ports);
   const lastCompletedPort =
@@ -212,17 +234,21 @@ export default function RouteMap({ order }) {
       ? routePoints.slice(lastCompletedPortIndex)
       : routePoints;
 
-  // Fit map to show all route points when available
+  // Lorsque tous les ports sont visibles, inclure aussi leurs positions
+  // afin que la carte donne une vue complète de l'Afrique.
   useEffect(() => {
     if (!map) return;
-    if (!routePoints || routePoints.length === 0) return;
+    const pointsToFit = showAllPorts
+      ? [...routePoints, ...africanPorts.map((port) => port.position)]
+      : routePoints;
+    if (pointsToFit.length === 0) return;
     try {
-      const bounds = L.latLngBounds(routePoints);
+      const bounds = L.latLngBounds(pointsToFit);
       map.fitBounds(bounds, { padding: [60, 60] });
     } catch (err) {
       // ignore
     }
-  }, [map, routePoints]);
+  }, [africanPorts, map, routePoints, showAllPorts]);
 
   return (
     <section className="overflow-hidden rounded-[2rem] border bg-white shadow-premium">
@@ -307,6 +333,28 @@ export default function RouteMap({ order }) {
             </Popup>
           </Marker>
         ))}
+
+        {showAllPorts &&
+          africanPorts.map((port, index) => (
+            <Marker
+              key={`african-port-${port.name}-${index}`}
+              position={port.position}
+              zIndexOffset={200}
+              icon={createMapIcon({
+                image: PORT_ICON,
+                title: port.name,
+                subtitle: port.country,
+                size: 28,
+              })}
+            >
+              <Popup>
+                <div className="text-sm">
+                  <div className="font-bold">{port.name}</div>
+                  <div className="text-xs text-slate-600">{port.country}</div>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
       </MapContainer>
     </section>
   );
