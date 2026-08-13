@@ -495,8 +495,68 @@ export default function OrderEditor(){
           <div className="mt-3 text-sm text-slate-600">Étapes générées: {form.route?.length || 0}</div>
         </section>
 
+        <section className="rounded-[1rem] border bg-white p-4">
+          <h3 className="font-extrabold mb-3">Photos du véhicule</h3>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={(e) => setFiles(Array.from(e.target.files || []))}
+            className="mb-3"
+          />
+          <div className="flex gap-3 flex-wrap">
+            {files.map((f, i) => (
+              <div key={i} className="w-28 overflow-hidden rounded-lg border">
+                <div className="p-2 text-xs font-semibold">{f.name}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[1rem] border bg-white p-4">
+          <h3 className="font-extrabold mb-3">Ports et escales (étapes)</h3>
+          <div className="space-y-3">
+            {(form.route || []).map((step, idx) => (
+              <div key={`${step.name}-${idx}`} className="flex items-center gap-3 rounded-lg border p-3">
+                <div className="flex-1">
+                  <div className="font-bold">{step.name || `Étape ${idx + 1}`}</div>
+                  <div className="text-xs text-slate-600">{step.country}</div>
+                  <div className="text-xs text-slate-500">Lat: {step.coordinates?.lat} · Lng: {step.coordinates?.lng}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      // If editing existing order, save immediately via API, otherwise update local form
+                      if (isEdit) {
+                        try {
+                          const newRoute = (form.route || []).map((r, i) => (i === idx ? { ...r, completed: true } : r));
+                          const { data } = await http.put(`/orders/${id}`, { route: newRoute });
+                          setForm(normalizeOrder(data.order));
+                        } catch (err) {
+                          console.error(err);
+                          alert('Erreur lors de la mise à jour de l\'étape');
+                        }
+                      } else {
+                        setForm((cur) => {
+                          const next = structuredClone(cur);
+                          if (next.route && next.route[idx]) next.route[idx].completed = true;
+                          return next;
+                        });
+                      }
+                    }}
+                    className={`rounded-full px-3 py-1 text-xs font-bold ${step.completed ? 'bg-emerald-200 text-emerald-800' : 'bg-brand-dark text-white'}`}
+                  >
+                    {step.completed ? 'Complété' : 'Marquer comme complété'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <div className="flex justify-end gap-3">
-          <button type="button" onClick={()=>{ setForm((c)=>({ ...c, route: [] })); }} className="rounded-full border px-4 py-2">Réinitialiser route</button>
+          <button type="button" onClick={()=>{ setForm((c)=>({ ...c, route: [] })); setFiles([]); }} className="rounded-full border px-4 py-2">Réinitialiser</button>
           <button type="submit" disabled={saving} className="rounded-full bg-brand-dark px-6 py-2 text-white font-bold">{saving ? 'Sauvegarde...' : 'Sauvegarder'}</button>
         </div>
       </form>
