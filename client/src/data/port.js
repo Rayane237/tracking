@@ -269,6 +269,71 @@ export const ports = [
     }
   },
 
+  // Ports supplémentaires de la Côte d'Ivoire
+  {
+    name: "Port de San-Pedro",
+    country: "Côte d'Ivoire",
+    coordinates: {
+      lat: 4.7458,
+      lng: -6.6413
+    }
+  },
+
+  {
+    name: "Port de Sassandra",
+    country: "Côte d'Ivoire",
+    coordinates: {
+      lat: 4.9500,
+      lng: -6.6667
+    }
+  },
+
+  // Ports de la Guinée (Conakry et côtiers)
+  {
+    name: "Port autonome de Conakry",
+    country: "Guinée",
+    coordinates: {
+      lat: 9.5456,
+      lng: -13.6810
+    }
+  },
+
+  {
+    name: "Port de Kamsar",
+    country: "Guinée",
+    coordinates: {
+      lat: 10.6692,
+      lng: -14.6301
+    }
+  },
+
+  {
+    name: "Port de Boké",
+    country: "Guinée",
+    coordinates: {
+      lat: 10.9400,
+      lng: -14.3019
+    }
+  },
+
+  {
+    name: "Port de Sangarédi",
+    country: "Guinée",
+    coordinates: {
+      lat: 11.0600,
+      lng: -13.8833
+    }
+  },
+
+  {
+    name: "Port de Coyah (terminal proche Conakry)",
+    country: "Guinée",
+    coordinates: {
+      lat: 9.7167,
+      lng: -13.5333
+    }
+  },
+
 
   {
     name:"Port de Dakar",
