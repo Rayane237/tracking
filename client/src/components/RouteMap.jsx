@@ -168,7 +168,7 @@ function getLastCompletedPortIndex(ports) {
   );
 }
 
-export default function RouteMap({ order, showAllPorts = false }) {
+export default function RouteMap({ order }) {
   if (!order?.currentLocation?.coordinates) {
     return null;
   }
@@ -198,8 +198,7 @@ export default function RouteMap({ order, showAllPorts = false }) {
       position: [Number(point.coordinates.lat), Number(point.coordinates.lng)],
     }));
 
-  // Jebel Ali est le point de départ hors Afrique : il ne fait pas partie
-  // de la liste des ports africains proposée au client.
+  // Les ports africains connus restent visibles sur la carte du client.
   const africanPorts = useMemo(
     () =>
       allPorts
@@ -234,13 +233,10 @@ export default function RouteMap({ order, showAllPorts = false }) {
       ? routePoints.slice(lastCompletedPortIndex)
       : routePoints;
 
-  // Lorsque tous les ports sont visibles, inclure aussi leurs positions
-  // afin que la carte donne une vue complète de l'Afrique.
+  // Inclure le trajet et les ports africains dans le cadrage automatique.
   useEffect(() => {
     if (!map) return;
-    const pointsToFit = showAllPorts
-      ? [...routePoints, ...africanPorts.map((port) => port.position)]
-      : routePoints;
+    const pointsToFit = [...routePoints, ...africanPorts.map((port) => port.position)];
     if (pointsToFit.length === 0) return;
     try {
       const bounds = L.latLngBounds(pointsToFit);
@@ -248,7 +244,7 @@ export default function RouteMap({ order, showAllPorts = false }) {
     } catch (err) {
       // ignore
     }
-  }, [africanPorts, map, routePoints, showAllPorts]);
+  }, [africanPorts, map, routePoints]);
 
   return (
     <section className="overflow-hidden rounded-[2rem] border bg-white shadow-premium">
@@ -334,8 +330,7 @@ export default function RouteMap({ order, showAllPorts = false }) {
           </Marker>
         ))}
 
-        {showAllPorts &&
-          africanPorts.map((port, index) => (
+        {africanPorts.map((port, index) => (
             <Marker
               key={`african-port-${port.name}-${index}`}
               position={port.position}
@@ -354,7 +349,7 @@ export default function RouteMap({ order, showAllPorts = false }) {
                 </div>
               </Popup>
             </Marker>
-          ))}
+        ))}
       </MapContainer>
     </section>
   );

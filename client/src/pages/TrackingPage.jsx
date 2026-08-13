@@ -13,7 +13,6 @@ export default function TrackingPage() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showAllPorts, setShowAllPorts] = useState(false);
 
  useEffect(() => {
   setLoading(true);
@@ -96,18 +95,7 @@ export default function TrackingPage() {
 
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
         <VehicleSummary order={order} />
-        <div className="flex items-center justify-between gap-4">
-          <RouteMap order={order} showAllPorts={showAllPorts} />
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            onClick={() => setShowAllPorts((s) => !s)}
-            className="rounded-full bg-brand-soft px-4 py-2 text-sm font-bold"
-          >
-            {showAllPorts ? 'Masquer tous les ports' : 'Afficher tous les ports d\'Afrique'}
-          </button>
-        </div>
+        <RouteMap order={order} />
 
         <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
           <Timeline events={order.events} />

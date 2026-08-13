@@ -352,6 +352,23 @@ export const ports = [
       lat:35.8806,
       lng:-5.5
     }
-  }
-
+  },
+  { name: "Port de Nouakchott", country: "Mauritanie", coordinates: { lat: 18.095, lng: -15.978 } },
+  { name: "Port de Banjul", country: "Gambie", coordinates: { lat: 13.454, lng: -16.579 } },
+  { name: "Port de Freetown", country: "Sierra Leone", coordinates: { lat: 8.495, lng: -13.715 } },
+  { name: "Port de Monrovia", country: "Liberia", coordinates: { lat: 6.300, lng: -10.800 } },
+  { name: "Port de Takoradi", country: "Ghana", coordinates: { lat: 4.884, lng: -1.752 } },
+  { name: "Port Autonome de Lome", country: "Togo", coordinates: { lat: 6.126, lng: 1.225 } },
+  { name: "Port de Cotonou", country: "Benin", coordinates: { lat: 6.360, lng: 2.419 } },
+  { name: "Port de Port Harcourt", country: "Nigeria", coordinates: { lat: 4.815, lng: 7.049 } },
+  { name: "Port de Calabar", country: "Nigeria", coordinates: { lat: 4.975, lng: 8.342 } },
+  { name: "Port de Malabo", country: "Guinee equatoriale", coordinates: { lat: 3.752, lng: 8.783 } },
+  { name: "Port de Sao Tome", country: "Sao Tome-et-Principe", coordinates: { lat: 0.337, lng: 6.731 } },
+  { name: "Port de Lobito", country: "Angola", coordinates: { lat: -12.348, lng: 13.546 } },
+  { name: "Port de Port Soudan", country: "Soudan", coordinates: { lat: 19.615, lng: 37.216 } },
+  { name: "Port d'Alexandrie", country: "Egypte", coordinates: { lat: 31.201, lng: 29.888 } },
+  { name: "Port de Casablanca", country: "Maroc", coordinates: { lat: 33.604, lng: -7.617 } },
+  { name: "Port d'Alger", country: "Algerie", coordinates: { lat: 36.753, lng: 3.059 } },
+  { name: "Port de Tunis", country: "Tunisie", coordinates: { lat: 36.819, lng: 10.305 } },
+  { name: "Port de Tripoli", country: "Libye", coordinates: { lat: 32.887, lng: 13.191 } }
 ];

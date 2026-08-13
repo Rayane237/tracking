@@ -9,6 +9,7 @@ import {
 
 import AdminShell from "../components/AdminShell.jsx";
 import { seaRoutes } from "../data/seaRoutes.js";
+import { ports as availablePorts } from "../data/port.js";
 import { statusOptions } from "../data/status.js";
 import http from "../api/http.js";
 
@@ -100,6 +101,7 @@ export default function OrderEditor(){
   const [loading,setLoading]=useState(isEdit);
 
   const [error,setError]=useState("");
+  const [selectedPort, setSelectedPort] = useState("");
 
 
 
@@ -201,6 +203,16 @@ export default function OrderEditor(){
 
 
   function changeDestination(destination){
+    const selected = availablePorts.find((port) => port.name === destination);
+    setForm((current) => ({
+      ...current,
+      shipment: {
+        ...current.shipment,
+        destinationPort: destination,
+        destinationCountry: selected?.country || current.shipment.destinationCountry,
+      },
+    }));
+    return;
 
     const clean = destination.trim().toLowerCase();
 
@@ -275,6 +287,35 @@ export default function OrderEditor(){
   }
 
 
+
+  function addPortToRoute() {
+    const port = availablePorts.find((item) => item.name === selectedPort);
+    if (!port) return;
+
+    setForm((current) => ({
+      ...current,
+      route: [
+        ...(current.route || []),
+        {
+          name: port.name,
+          country: port.country,
+          coordinates: {
+            lat: Number(port.coordinates.lat),
+            lng: Number(port.coordinates.lng),
+          },
+          completed: false,
+        },
+      ],
+    }));
+    setSelectedPort("");
+  }
+
+  function removeRoutePort(index) {
+    setForm((current) => ({
+      ...current,
+      route: current.route.filter((_, routeIndex) => routeIndex !== index),
+    }));
+  }
 
   async function generateCode(){
 
@@ -558,6 +599,28 @@ export default function OrderEditor(){
 
         <section className="rounded-[1rem] border bg-white p-4">
           <h3 className="font-extrabold mb-3">Ports et escales (étapes)</h3>
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row">
+            <select
+              className="min-w-0 flex-1 rounded-lg border p-3"
+              value={selectedPort}
+              onChange={(e) => setSelectedPort(e.target.value)}
+            >
+              <option value="">Choisir un port a ajouter au trajet</option>
+              {availablePorts.map((port) => (
+                <option key={port.name} value={port.name}>
+                  {port.name} - {port.country}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={addPortToRoute}
+              disabled={!selectedPort}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-dark px-4 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={18} /> Ajouter l'escale
+            </button>
+          </div>
           <div className="space-y-3">
             {(form.route || []).map((step, idx) => (
               <div key={`${step.name}-${idx}`} className="flex items-center gap-3 rounded-lg border p-3">
@@ -568,6 +631,13 @@ export default function OrderEditor(){
                   <div className="text-xs text-slate-500">Lat: {step.coordinates?.lat} · Lng: {step.coordinates?.lng}</div>
                 </div>
                 <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => removeRoutePort(idx)}
+                    className="rounded-full border border-red-200 px-3 py-1 text-xs font-bold text-red-700"
+                  >
+                    Retirer
+                  </button>
                   <button
                     type="button"
                     onClick={async () => {
