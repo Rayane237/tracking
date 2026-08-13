@@ -1,4 +1,5 @@
 import L from "leaflet";
+import { useState, useEffect } from "react";
 import { MapContainer, Marker, Polyline, TileLayer, Popup } from "react-leaflet";
 import { useAuth } from "../context/AuthContext.jsx";
 import http from "../api/http.js";
@@ -173,6 +174,8 @@ export default function RouteMap({ order }) {
 
   const { user } = useAuth();
 
+  const [map, setMap] = useState(null);
+
   const current = [
     Number(order.currentLocation.coordinates.lat),
     Number(order.currentLocation.coordinates.lng),
@@ -209,9 +212,22 @@ export default function RouteMap({ order }) {
       ? routePoints.slice(lastCompletedPortIndex)
       : routePoints;
 
+  // Fit map to show all route points when available
+  useEffect(() => {
+    if (!map) return;
+    if (!routePoints || routePoints.length === 0) return;
+    try {
+      const bounds = L.latLngBounds(routePoints);
+      map.fitBounds(bounds, { padding: [60, 60] });
+    } catch (err) {
+      // ignore
+    }
+  }, [map, routePoints]);
+
   return (
     <section className="overflow-hidden rounded-[2rem] border bg-white shadow-premium">
       <MapContainer
+        whenCreated={setMap}
         center={ports.length ? ports[Math.floor(ports.length / 2)].position : current}
         zoom={3}
       >
@@ -258,12 +274,7 @@ export default function RouteMap({ order }) {
               image: PORT_ICON,
               title: port.name,
               subtitle: port.country,
-              badge:
-                index === 0
-                  ? "DEPART"
-                  : index === ports.length - 1
-                    ? "FIN"
-                    : "",
+              badge: String(index + 1),
               size: 38,
             })}
           >

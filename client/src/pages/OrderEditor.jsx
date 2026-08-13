@@ -504,13 +504,56 @@ export default function OrderEditor(){
             onChange={(e) => setFiles(Array.from(e.target.files || []))}
             className="mb-3"
           />
-          <div className="flex gap-3 flex-wrap">
+          <div className="flex gap-3 flex-wrap mb-3">
             {files.map((f, i) => (
               <div key={i} className="w-28 overflow-hidden rounded-lg border">
                 <div className="p-2 text-xs font-semibold">{f.name}</div>
               </div>
             ))}
           </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={async () => {
+                if (!isEdit) {
+                  alert("Sauvegardez la commande d'abord pour téléverser des photos immédiatement.");
+                  return;
+                }
+
+                if (!files.length) {
+                  alert('Aucun fichier sélectionné.');
+                  return;
+                }
+
+                try {
+                  const fd = new FormData();
+                  files.forEach((file) => fd.append('photos', file));
+                  const { data } = await http.post(`/orders/${id}/photos`, fd, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                  });
+                  setForm(normalizeOrder(data.order));
+                  setFiles([]);
+                } catch (err) {
+                  console.error(err);
+                  alert('Erreur lors du téléversement des photos.');
+                }
+              }}
+              className="rounded-full bg-brand-dark px-4 py-2 text-white font-bold"
+            >
+              Téléverser maintenant
+            </button>
+
+            <span className="text-sm text-slate-500">Vous pouvez aussi sauvegarder le formulaire pour téléverser après création.</span>
+          </div>
+
+          {form.photos?.length > 0 && (
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              {form.photos.map((p) => (
+                <img key={p.url} src={p.url} alt={p.caption} className="h-24 w-full rounded-lg object-cover" />
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="rounded-[1rem] border bg-white p-4">
@@ -518,8 +561,9 @@ export default function OrderEditor(){
           <div className="space-y-3">
             {(form.route || []).map((step, idx) => (
               <div key={`${step.name}-${idx}`} className="flex items-center gap-3 rounded-lg border p-3">
+                <div className="w-8 h-8 rounded-full bg-brand-soft grid place-items-center font-extrabold">{idx + 1}</div>
                 <div className="flex-1">
-                  <div className="font-bold">{step.name || `Étape ${idx + 1}`}</div>
+                  <div className="font-bold">{`Étape ${idx + 1} — ${step.name || ''}`}</div>
                   <div className="text-xs text-slate-600">{step.country}</div>
                   <div className="text-xs text-slate-500">Lat: {step.coordinates?.lat} · Lng: {step.coordinates?.lng}</div>
                 </div>
