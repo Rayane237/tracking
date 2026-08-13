@@ -152,4 +152,137 @@ export const seaRoutes = {
   },
 
 
+  // =====================================
+  // CÔTE D'IVOIRE
+  // =====================================
+
+  "Abidjan":{
+
+    name:"Port d'Abidjan",
+    country:"Côte d'Ivoire",
+
+    coordinates:{
+      lat:5.3097,
+      lng:-4.0127
+    }
+
+  },
+
+  "San-Pedro":{
+
+    name:"Port de San-Pedro",
+    country:"Côte d'Ivoire",
+
+    coordinates:{
+      lat:4.7458,
+      lng:-6.6413
+    }
+
+  },
+
+  "Sassandra":{
+
+    name:"Port de Sassandra",
+    country:"Côte d'Ivoire",
+
+    coordinates:{
+      lat:4.95,
+      lng:-6.6667
+    }
+
+  },
+
+  // =====================================
+  // GUINÉE
+  // =====================================
+
+  "Conakry":{
+
+    name:"Port autonome de Conakry",
+    country:"Guinée",
+
+    coordinates:{
+      lat:9.5456,
+      lng:-13.6810
+    }
+
+  },
+
+  "Kamsar":{
+
+    name:"Port de Kamsar",
+    country:"Guinée",
+
+    coordinates:{
+      lat:10.6692,
+      lng:-14.6301
+    }
+
+  },
+
+  "Boke":{
+
+    name:"Port de Boké",
+    country:"Guinée",
+
+    coordinates:{
+      lat:10.94,
+      lng:-14.3019
+    }
+
+  },
+
+  "Sangaredi":{
+
+    name:"Port de Sangarédi",
+    country:"Guinée",
+
+    coordinates:{
+      lat:11.06,
+      lng:-13.8833
+    }
+
+  },
+
+  "Coyah":{
+
+    name:"Port de Coyah",
+    country:"Guinée",
+
+    coordinates:{
+      lat:9.7167,
+      lng:-13.5333
+    }
+
+  },
+
+  // =====================================
+  // BÉNIN
+  // =====================================
+
+  "Cotonou":{
+
+    name:"Port de Cotonou",
+    country:"Bénin",
+
+    coordinates:{
+      lat:6.3602,
+      lng:2.4186
+    }
+
+  },
+
+  "Seme-Podji":{
+
+    name:"Port de Sèmè-Podji",
+    country:"Bénin",
+
+    coordinates:{
+      lat:6.35,
+      lng:2.5
+    }
+
+  }
+
+
 };

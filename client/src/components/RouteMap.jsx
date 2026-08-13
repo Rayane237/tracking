@@ -1,5 +1,7 @@
 import L from "leaflet";
-import { MapContainer, Marker, Polyline, TileLayer } from "react-leaflet";
+import { MapContainer, Marker, Polyline, TileLayer, Popup } from "react-leaflet";
+import { useAuth } from "../context/AuthContext.jsx";
+import http from "../api/http.js";
 
 const SHIP_ICON = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
@@ -169,6 +171,8 @@ export default function RouteMap({ order }) {
     return null;
   }
 
+  const { user } = useAuth();
+
   const current = [
     Number(order.currentLocation.coordinates.lat),
     Number(order.currentLocation.coordinates.lng),
@@ -262,7 +266,35 @@ export default function RouteMap({ order }) {
                     : "",
               size: 38,
             })}
-          />
+          >
+            <Popup>
+              <div className="text-sm">
+                <div className="font-bold">{port.name}</div>
+                <div className="text-xs text-slate-600">{port.country}</div>
+                {/** show complete button for admins and when not already completed **/}
+                {user?.role === 'admin' && !port.completed && (
+                  <div className="mt-2">
+                    <button
+                      onClick={async () => {
+                        try {
+                          const newRoute = (order.route || []).map((r, i) => (i === index ? { ...r, completed: true } : r));
+                          await http.put(`/orders/${order._id}`, { route: newRoute });
+                          // reload to reflect changes
+                          window.location.reload();
+                        } catch (err) {
+                          console.error(err);
+                          alert('Erreur lors de la mise à jour du statut.');
+                        }
+                      }}
+                      className="rounded-full bg-brand-dark px-3 py-1 text-xs font-bold text-white"
+                    >
+                      Marquer comme complété
+                    </button>
+                  </div>
+                )}
+              </div>
+            </Popup>
+          </Marker>
         ))}
       </MapContainer>
     </section>

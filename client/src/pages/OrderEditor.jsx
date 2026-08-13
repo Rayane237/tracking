@@ -57,422 +57,370 @@ const emptyForm = {
 
 function normalizeOrder(order){
 
-return {
+  return {
 
-...emptyForm,
+    ...emptyForm,
 
-...order,
+    ...order,
 
-vehicle:{
-...emptyForm.vehicle,
-...order.vehicle
-},
+    vehicle:{
+      ...emptyForm.vehicle,
+      ...order.vehicle
+    },
 
-shipment:{
-...emptyForm.shipment,
-...order.shipment
-},
+    shipment:{
+      ...emptyForm.shipment,
+      ...order.shipment
+    },
 
-route:order.route || []
+    route:order.route || []
 
-};
+  };
 
 }
-
 
 
 
 
 export default function OrderEditor(){
 
-const {id}=useParams();
+  const {id}=useParams();
 
-const isEdit=Boolean(id);
+  const isEdit=Boolean(id);
 
-const navigate=useNavigate();
+  const navigate=useNavigate();
 
 
-const [form,setForm]=useState(emptyForm);
+  const [form,setForm]=useState(emptyForm);
 
-const [files,setFiles]=useState([]);
+  const [files,setFiles]=useState([]);
 
-const [saving,setSaving]=useState(false);
+  const [saving,setSaving]=useState(false);
 
-const [loading,setLoading]=useState(isEdit);
+  const [loading,setLoading]=useState(isEdit);
 
-const [error,setError]=useState("");
+  const [error,setError]=useState("");
 
 
 
-const title=useMemo(
+  const title=useMemo(
 
-()=>isEdit
-?
-"Modifier la commande"
-:
-"Nouvelle commande",
+    ()=>isEdit
+    ?
+    "Modifier la commande"
+    :
+    "Nouvelle commande",
 
-[isEdit]
+    [isEdit]
 
-);
+  );
 
 
 
 
+  useEffect(()=>{
 
-useEffect(()=>{
+    if(!isEdit)return;
 
-if(!isEdit)return;
 
+    http.get(`/orders/${id}`)
+    .then(({data})=>{
 
-http.get(`/orders/${id}`)
-.then(({data})=>{
+      setForm(normalizeOrder(data.order));
 
-setForm(normalizeOrder(data.order));
+    })
+    .finally(()=>setLoading(false));
 
-})
-.finally(()=>setLoading(false));
 
+  },[id,isEdit]);
 
-},[id,isEdit]);
 
 
 
+  function setField(path,value){
 
+    setForm(current=>{
 
+      const next=structuredClone(current);
 
+      const keys=path.split(".");
 
-function setField(path,value){
+      let target=next;
 
-setForm(current=>{
 
-const next=structuredClone(current);
+      keys
+      .slice(0,-1)
+      .forEach(k=>{
 
-const keys=path.split(".");
+        target=target[k];
 
-let target=next;
+      });
 
 
-keys
-.slice(0,-1)
-.forEach(k=>{
+      target[keys[keys.length-1]]=value;
 
-target=target[k];
 
-});
+      return next;
 
+    });
 
-target[keys[keys.length-1]]=value;
 
+  }
 
-return next;
 
 
-});
+  function setRoute(index, path, value){
+    setForm(current=>{
+      const next = structuredClone(current);
+      if(!next.route[index]) return next;
+      const keys = path.split(".");
+      let target = next.route[index];
+      keys.slice(0,-1).forEach(k=>{ target = target[k]; });
+      target[keys[keys.length-1]] = value;
+      return next;
+    });
 
-}
+  }
 
 
-function setRoute(index, path, value){
-  setForm(current=>{
-    const next = structuredClone(current);
-    if(!next.route[index]) return next;
-    const keys = path.split(".");
-    let target = next.route[index];
-    keys.slice(0,-1).forEach(k=>{ target = target[k]; });
-    target[keys[keys.length-1]] = value;
-    return next;
-  });
 
-}
+  function setEvent(index, path, value){
+    setForm(current=>{
+      const next = structuredClone(current);
+      if(!next.events[index]) return next;
+      const keys = path.split(".");
+      let target = next.events[index];
+      keys.slice(0,-1).forEach(k=>{ target = target[k]; });
+      target[keys[keys.length-1]] = value;
+      return next;
+    });
 
+  }
 
-function setEvent(index, path, value){
-  setForm(current=>{
-    const next = structuredClone(current);
-    if(!next.events[index]) return next;
-    const keys = path.split(".");
-    let target = next.events[index];
-    keys.slice(0,-1).forEach(k=>{ target = target[k]; });
-    target[keys[keys.length-1]] = value;
-    return next;
-  });
 
-}
 
 
+  function changeDestination(destination){
 
+    const clean = destination.trim().toLowerCase();
 
+    let key = '';
 
+    if (clean.includes('lome') || clean.includes('lomé')) key = 'Lome';
+    else if (clean.includes('banana')) key = 'Banana';
+    else if (clean.includes('boma')) key = 'Boma';
+    else if (clean.includes('matadi')) key = 'Matadi';
+    else if (clean.includes('kinshasa')) key = 'Kinshasa';
 
-function changeDestination(destination){
+    // Côte d'Ivoire
+    else if (clean.includes('abidjan')) key = 'Abidjan';
+    else if (clean.includes('san') || clean.includes('san-pedro') || clean.includes('sanpedro')) key = 'San-Pedro';
+    else if (clean.includes('sassandra')) key = 'Sassandra';
 
-const clean = destination.trim().toLowerCase();
+    // Guinée
+    else if (clean.includes('conakry')) key = 'Conakry';
+    else if (clean.includes('kamsar')) key = 'Kamsar';
+    else if (clean.includes('bok') || clean.includes('boke')) key = 'Boke';
+    else if (clean.includes('sangar') || clean.includes('sangaredi')) key = 'Sangaredi';
+    else if (clean.includes('coyah')) key = 'Coyah';
 
-let key = "";
+    // Bénin
+    else if (clean.includes('cotonou')) key = 'Cotonou';
+    else if (clean.includes('seme') || clean.includes('s%C3%A8me') || clean.includes('s%C3%A8me-podji')) key = 'Seme-Podji';
 
+    const finalDestination = seaRoutes[key];
 
-if(clean.includes("lome") || clean.includes("lomé")){
-  key="Lome";
-}
+    if (!finalDestination) return;
 
-else if(clean.includes("banana")){
-  key="Banana";
-}
+    // build route: base + destination (Jebel Ali-Base has 9 points, plus destination = 10)
+    let route = [];
+    if (Array.isArray(finalDestination)) route = [...seaRoutes['Jebel Ali-Base'], ...finalDestination];
+    else route = [...seaRoutes['Jebel Ali-Base'], finalDestination];
 
-else if(clean.includes("boma")){
-  key="Boma";
-}
+    // format compatible backend
+    route = route.map((point) => ({
+      name: point.name || '',
+      country: point.country || 'International',
+      coordinates: { lat: Number(point.coordinates.lat), lng: Number(point.coordinates.lng) },
+      completed: Boolean(point.completed),
+    }));
 
-else if(clean.includes("matadi")){
-  key="Matadi";
-}
+    // attempt to infer country for destination when not provided
+    const countriesByKey = {
+      Lome: 'Togo',
+      Banana: 'République Démocratique du Congo',
+      Boma: 'République Démocratique du Congo',
+      Matadi: 'République Démocratique du Congo',
+      Kinshasa: 'République Démocratique du Congo',
+      Abidjan: "Côte d'Ivoire",
+      'San-Pedro': "Côte d'Ivoire",
+      Sassandra: "Côte d'Ivoire",
+      Conakry: 'Guinée',
+      Kamsar: 'Guinée',
+      Boke: 'Guinée',
+      Sangaredi: 'Guinée',
+      Coyah: 'Guinée',
+      Cotonou: 'Bénin',
+      'Seme-Podji': 'Bénin',
+    };
 
-else if(clean.includes("kinshasa")){
-  key="Kinshasa";
-}
+    const country = countriesByKey[key] || 'International';
 
+    setForm((current) => ({
+      ...current,
+      shipment: { ...current.shipment, destinationPort: destination, destinationCountry: country },
+      route,
+    }));
 
+  }
 
-const finalDestination = seaRoutes[key];
 
 
-if(!finalDestination){
-  return;
-}
+  async function generateCode(){
 
+    const {data}=await http.get("/orders/generate-code");
 
 
-let route = [
+    setField(
+      "trackingCode",
+      data.trackingCode
+    );
 
-  ...seaRoutes["Jebel Ali-Base"],
 
-  finalDestination
+  }
 
-];
 
 
 
-// format compatible backend
+  async function submit(e){
 
-route = route.map(point=>({
+    e.preventDefault();
 
-name: point.name || "",
 
-country: point.country || "International",
+    setSaving(true);
 
-coordinates:{
-lat:Number(point.coordinates.lat),
-lng:Number(point.coordinates.lng)
-}
+    setError("");
 
-}));
 
+    try{
 
+      console.log("FORMULAIRE ENVOYE AU SERVEUR");
+      console.log(JSON.stringify(form, null, 2));
 
 
-let country="";
+      const cleanForm = {
 
+        ...form,
 
-if(key==="Lome"){
+        route: form.route
+        .filter(
+          point =>
+          point.name &&
+          point.coordinates?.lat &&
+          point.coordinates?.lng
+        )
+        .map(point=>({
 
-country="Togo";
+          name:point.name,
 
-}
-else{
+          country:point.country || "International",
 
-country="République Démocratique du Congo";
+          eta:point.eta || "",
 
-}
+          coordinates:{
+            lat:Number(point.coordinates.lat),
+            lng:Number(point.coordinates.lng)
+          },
 
+          completed:Boolean(point.completed)
 
+        }))
 
-setForm(current=>({
+      };
 
-...current,
 
+      console.log(
+        "ROUTE NETTOYEE",
+        JSON.stringify(cleanForm.route,null,2)
+      );
 
-shipment:{
 
-...current.shipment,
+      const {data}=isEdit
 
-destinationPort:destination,
+      ?
 
-destinationCountry:country
+      await http.put(`/orders/${id}`,cleanForm)
 
-},
+      :
 
+      await http.post("/orders",cleanForm);
 
-route
 
-}));
+      if(files.length){
 
-}
 
+        const fd=new FormData();
 
 
+        files.forEach(file=>{
 
+          fd.append("photos",file);
 
+        });
 
-async function generateCode(){
 
-const {data}=await http.get("/orders/generate-code");
+        await http.post(
 
+          `/orders/${data.order._id}/photos`,
 
-setField(
-"trackingCode",
-data.trackingCode
-);
+          fd,
 
+          {
+            headers:{
+              "Content-Type":"multipart/form-data"
+            }
+          }
 
-}
+        );
 
 
+      }
 
 
+      navigate("/admin/commandes");
 
 
+    }
 
+    catch(err){
 
-async function submit(e){
 
-e.preventDefault();
+      setError(
 
+        err.response?.data?.message ||
 
-setSaving(true);
+        "Erreur sauvegarde"
 
-setError("");
+      );
 
 
+    }
 
-try{
+    finally{
 
-console.log("FORMULAIRE ENVOYE AU SERVEUR");
-console.log(JSON.stringify(form, null, 2));
 
+      setSaving(false);
 
-const cleanForm = {
 
-...form,
+    }
 
-route: form.route
-.filter(
-point =>
-point.name &&
-point.coordinates?.lat &&
-point.coordinates?.lng
-)
-.map(point=>({
 
-name:point.name,
+  }
 
-country:point.country || "International",
 
-eta:point.eta || "",
 
-coordinates:{
-lat:Number(point.coordinates.lat),
-lng:Number(point.coordinates.lng)
-},
 
-completed:Boolean(point.completed)
-
-}))
-
-};
-
-
-console.log(
-"ROUTE NETTOYEE",
-JSON.stringify(cleanForm.route,null,2)
-);
-
-
-
-const {data}=isEdit
-
-?
-
-await http.put(`/orders/${id}`,cleanForm)
-
-:
-
-await http.post("/orders",cleanForm);
-
-
-
-if(files.length){
-
-
-const fd=new FormData();
-
-
-
-files.forEach(file=>{
-
-fd.append("photos",file);
-
-});
-
-
-
-await http.post(
-
-`/orders/${data.order._id}/photos`,
-
-fd,
-
-{
-
-headers:{
-"Content-Type":"multipart/form-data"
-}
-
-}
-
-);
-
-
-}
-
-
-
-navigate("/admin/commandes");
-
-
-
-}
-
-catch(err){
-
-
-setError(
-
-err.response?.data?.message ||
-
-"Erreur sauvegarde"
-
-);
-
-
-}
-
-finally{
-
-
-setSaving(false);
-
-
-}
-
-
-}
-
-
-
-
-
-return (
+  return (
     <AdminShell>
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
@@ -492,286 +440,67 @@ return (
       </div>
 
       <form onSubmit={submit} className="mt-6 space-y-6">
-        <Section title="Informations client et suivi">
-          <Grid>
-            <Input label="Code de suivi" value={form.trackingCode} onChange={(value) => setField('trackingCode', value.toUpperCase())} placeholder="Auto si vide" />
-            <Input label="Client" value={form.customerName} onChange={(value) => setField('customerName', value)} required />
-            <Input label="Telephone" value={form.customerPhone} onChange={(value) => setField('customerPhone', value)} />
-            <Input label="Email" value={form.customerEmail} onChange={(value) => setField('customerEmail', value)} type="email" />
-            <Select label="Statut" value={form.status} onChange={(value) => setField('status', value)} options={statusOptions} />
-          </Grid>
-        </Section>
-
-        <Section title="Vehicule">
-          <Grid>
-            <Input label="Marque" value={form.vehicle.brand} onChange={(value) => setField('vehicle.brand', value)} required />
-            <Input label="Modele" value={form.vehicle.model} onChange={(value) => setField('vehicle.model', value)} required />
-            <Input label="Annee" type="number" value={form.vehicle.year} onChange={(value) => setField('vehicle.year', value)} required />
-            <Input label="Couleur" value={form.vehicle.color} onChange={(value) => setField('vehicle.color', value)} required />
-            <Input label="Quantite" type="number" value={form.vehicle.quantity} onChange={(value) => setField('vehicle.quantity', value)} required />
-            <Input label="VIN / Chassis" value={form.vehicle.vin} onChange={(value) => setField('vehicle.vin', value)} />
-          </Grid>
-        </Section>
-
-        <Section title="Expedition">
-          <Grid>
-            <Input label="Navire" value={form.shipment.vesselName} onChange={(value) => setField('shipment.vesselName', value)} required />
-            <Input label="Port de depart" value={form.shipment.departurePort} onChange={(value) => setField('shipment.departurePort', value)} required />
-<Select
-
-label="Port destination"
-
-value={form.shipment.destinationPort}
-
-onChange={(value)=>{
-
-setField(
-'shipment.destinationPort',
-value
-);
-
-changeDestination(value);
-
-}}
-
-options={[
-
-{
-value:"",
-label:"Choisir destination"
-},
-
-{
-value:"Port Autonome de Lomé",
-label:"Port Autonome de Lomé - Togo"
-},
-
-{
-value:"Port de Banana",
-label:"Port de Banana - RDC"
-},
-
-{
-value:"Port de Boma",
-label:"Port de Boma - RDC"
-},
-
-{
-value:"Port de Matadi",
-label:"Port de Matadi - RDC"
-},
-
-{
-value:"Port de Kinshasa",
-label:"Port de Kinshasa - RDC"
-}
-
-]}
-
-/>
-            <Input label="Pays destination" value={form.shipment.destinationCountry} onChange={(value) => setField('shipment.destinationCountry', value)} required />
-            <Input label="Date depart" type="date" value={form.shipment.departureDate} onChange={(value) => setField('shipment.departureDate', value)} />
-            <Input label="Arrivee estimee" type="date" value={form.shipment.estimatedArrivalDate} onChange={(value) => setField('shipment.estimatedArrivalDate', value)} />
-          </Grid>
-        </Section>
-
-        <Section title="Position actuelle">
-          <Grid>
-            <Input label="Libelle position" value={form.currentLocation.label} onChange={(value) => setField('currentLocation.label', value)} required />
-            <Input label="Latitude" type="number" step="any" value={form.currentLocation.coordinates.lat} onChange={(value) => setField('currentLocation.coordinates.lat', value)} required />
-            <Input label="Longitude" type="number" step="any" value={form.currentLocation.coordinates.lng} onChange={(value) => setField('currentLocation.coordinates.lng', value)} required />
-          </Grid>
-        </Section>
-
-        <Section
-          title="Ports et escales"
-          action={
-            <button
-              type="button"
-              onClick={() =>
-                setForm((current) => ({
-                  ...current,
-                  route: [
-                    ...current.route,
-                    { name: '', country: '', eta: '', coordinates: { lat: '', lng: '' }, completed: false },
-                  ],
-                }))
-              }
-              className="inline-flex items-center gap-2 rounded-full bg-brand-dark px-4 py-2 text-xs font-bold text-white"
-            >
-              <Plus size={15} />
-              Ajouter
-            </button>
-          }
-        >
-          <div className="space-y-3">
-            {form.route.map((port, index) => (
-              <div key={`${port.name}-${index}`} className="grid gap-3 rounded-2xl bg-brand-soft p-4 md:grid-cols-6">
-                <Input label="Port" value={port.name} onChange={(value) => setRoute(index, 'name', value)} />
-                <Input label="Pays" value={port.country} onChange={(value) => setRoute(index, 'country', value)} />
-                <Input label="ETA" type="date" value={port.eta} onChange={(value) => setRoute(index, 'eta', value)} />
-                <Input label="Lat" type="number" step="any" value={port.coordinates.lat} onChange={(value) => setRoute(index, 'coordinates.lat', value)} />
-                <Input label="Lng" type="number" step="any" value={port.coordinates.lng} onChange={(value) => setRoute(index, 'coordinates.lng', value)} />
-                <label className="flex items-end gap-2 text-sm font-bold text-brand-graphite">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(port.completed)}
-                    onChange={(event) => setRoute(index, 'completed', event.target.checked)}
-                    className="mb-3 h-5 w-5 rounded border-brand-line text-brand-red focus:ring-brand-red"
-                  />
-                  Complete
-                </label>
-              </div>
-            ))}
+        <section className="rounded-[1rem] border bg-white p-4">
+          <h3 className="font-extrabold mb-3">Informations client</h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input className="p-3 rounded-lg border" placeholder="Code de suivi" value={form.trackingCode} onChange={(e)=>setField('trackingCode', e.target.value.toUpperCase())} />
+            <input className="p-3 rounded-lg border" placeholder="Nom du client" value={form.customerName} onChange={(e)=>setField('customerName', e.target.value)} />
+            <input className="p-3 rounded-lg border" placeholder="Téléphone" value={form.customerPhone} onChange={(e)=>setField('customerPhone', e.target.value)} />
+            <input className="p-3 rounded-lg border" placeholder="Email" type="email" value={form.customerEmail} onChange={(e)=>setField('customerEmail', e.target.value)} />
+            <select className="p-3 rounded-lg border" value={form.status} onChange={(e)=>setField('status', e.target.value)}>
+              {statusOptions.map(opt=> <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+            </select>
           </div>
-        </Section>
+        </section>
 
-        <Section
-          title="Historique"
-          action={
-            <button
-              type="button"
-              onClick={() =>
-                setForm((current) => ({
-                  ...current,
-                  events: [
-                    {
-                      title: '',
-                      description: '',
-                      location: '',
-                      status: current.status,
-                      date: new Date().toISOString().slice(0, 16),
-                    },
-                    ...current.events,
-                  ],
-                }))
-              }
-              className="inline-flex items-center gap-2 rounded-full bg-brand-dark px-4 py-2 text-xs font-bold text-white"
-            >
-              <Plus size={15} />
-              Ajouter
-            </button>
-          }
-        >
-          <div className="space-y-3">
-            {form.events.length === 0 && (
-              <p className="rounded-2xl bg-brand-soft p-4 text-sm font-semibold text-slate-500">
-                Aucun evenement. Ajoute une mise a jour pour alimenter la timeline client.
-              </p>
-            )}
-            {form.events.map((event, index) => (
-              <div key={event._id || index} className="rounded-2xl bg-brand-soft p-4">
-                <div className="grid gap-3 md:grid-cols-4">
-                  <Input label="Titre" value={event.title} onChange={(value) => setEvent(index, 'title', value)} />
-                  <Input label="Lieu" value={event.location} onChange={(value) => setEvent(index, 'location', value)} />
-                  <Input label="Date" type="datetime-local" value={event.date} onChange={(value) => setEvent(index, 'date', value)} />
-                  <Select label="Statut" value={event.status} onChange={(value) => setEvent(index, 'status', value)} options={statusOptions} />
-                </div>
-                <textarea
-                  value={event.description}
-                  onChange={(e) => setEvent(index, 'description', e.target.value)}
-                  placeholder="Description de la mise a jour"
-                  className="mt-3 min-h-24 w-full rounded-2xl border border-brand-line bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-brand-red focus:ring-4 focus:ring-red-100"
-                />
-              </div>
-            ))}
+        <section className="rounded-[1rem] border bg-white p-4">
+          <h3 className="font-extrabold mb-3">Véhicule</h3>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <input className="p-3 rounded-lg border" placeholder="Marque" value={form.vehicle.brand} onChange={(e)=>setField('vehicle.brand', e.target.value)} />
+            <input className="p-3 rounded-lg border" placeholder="Modèle" value={form.vehicle.model} onChange={(e)=>setField('vehicle.model', e.target.value)} />
+            <input className="p-3 rounded-lg border" placeholder="Année" type="number" value={form.vehicle.year} onChange={(e)=>setField('vehicle.year', e.target.value)} />
+            <input className="p-3 rounded-lg border" placeholder="Couleur" value={form.vehicle.color} onChange={(e)=>setField('vehicle.color', e.target.value)} />
+            <input className="p-3 rounded-lg border" placeholder="Quantité" type="number" value={form.vehicle.quantity} onChange={(e)=>setField('vehicle.quantity', e.target.value)} />
+            <input className="p-3 rounded-lg border" placeholder="VIN / Châssis" value={form.vehicle.vin} onChange={(e)=>setField('vehicle.vin', e.target.value)} />
           </div>
-        </Section>
+        </section>
 
-        <Section title="Photos du vehicule">
-          <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-brand-line bg-brand-soft p-8 text-center hover:border-brand-red">
-            <Upload className="text-brand-red" size={28} />
-            <span className="mt-3 text-sm font-extrabold text-brand-dark">
-              Televerser des photos JPG, PNG ou WEBP
-            </span>
-            <span className="mt-1 text-xs font-semibold text-slate-500">
-              {files.length ? `${files.length} fichier(s) selectionne(s)` : 'Maximum 8 images'}
-            </span>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={(event) => setFiles(Array.from(event.target.files || []))}
-            />
-          </label>
-        </Section>
+        <section className="rounded-[1rem] border bg-white p-4">
+          <h3 className="font-extrabold mb-3">Expédition</h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input className="p-3 rounded-lg border" placeholder="Navire" value={form.shipment.vesselName} onChange={(e)=>setField('shipment.vesselName', e.target.value)} />
+            <input className="p-3 rounded-lg border" placeholder="Port de départ" value={form.shipment.departurePort} onChange={(e)=>setField('shipment.departurePort', e.target.value)} />
+            <select className="p-3 rounded-lg border" value={form.shipment.destinationPort} onChange={(e)=>{ setField('shipment.destinationPort', e.target.value); changeDestination(e.target.value); }}>
+              <option value="">Choisir destination</option>
+              <option value="Port Autonome de Lomé">Port Autonome de Lomé - Togo</option>
+              <option value="Port de Banana">Port de Banana - RDC</option>
+              <option value="Port de Boma">Port de Boma - RDC</option>
+              <option value="Port de Matadi">Port de Matadi - RDC</option>
+              <option value="Port de Kinshasa">Port de Kinshasa - RDC</option>
+              <option value="Port d'Abidjan">Port d'Abidjan - Côte d'Ivoire</option>
+              <option value="Port de San-Pedro">Port de San-Pedro - Côte d'Ivoire</option>
+              <option value="Port de Sassandra">Port de Sassandra - Côte d'Ivoire</option>
+              <option value="Port autonome de Conakry">Port autonome de Conakry - Guinée</option>
+              <option value="Port de Kamsar">Port de Kamsar - Guinée</option>
+              <option value="Port de Boké">Port de Boké - Guinée</option>
+              <option value="Port de Sangarédi">Port de Sangarédi - Guinée</option>
+              <option value="Port de Coyah">Port de Coyah - Guinée</option>
+              <option value="Port de Cotonou">Port de Cotonou - Bénin</option>
+              <option value="Port de Sèmè-Podji">Port de Sèmè-Podji - Bénin</option>
+            </select>
+            <input className="p-3 rounded-lg border" placeholder="Pays destination" value={form.shipment.destinationCountry} onChange={(e)=>setField('shipment.destinationCountry', e.target.value)} />
+            <input className="p-3 rounded-lg border" placeholder="Date départ" type="date" value={form.shipment.departureDate} onChange={(e)=>setField('shipment.departureDate', e.target.value)} />
+            <input className="p-3 rounded-lg border" placeholder="Arrivée estimée" type="date" value={form.shipment.estimatedArrivalDate} onChange={(e)=>setField('shipment.estimatedArrivalDate', e.target.value)} />
+          </div>
+          <div className="mt-3 text-sm text-slate-600">Étapes générées: {form.route?.length || 0}</div>
+        </section>
 
-        {error && <p className="rounded-2xl bg-red-50 p-4 text-sm font-bold text-brand-red">{error}</p>}
-
-        <div className="sticky bottom-4 z-10 flex justify-end">
-          <button
-            type="submit"
-            disabled={saving}
-            className="inline-flex items-center gap-2 rounded-full bg-brand-red px-7 py-4 text-sm font-extrabold uppercase tracking-wide text-white shadow-glow disabled:opacity-70"
-          >
-            <Save size={18} />
-            {saving ? 'Enregistrement...' : 'Enregistrer'}
-          </button>
+        <div className="flex justify-end gap-3">
+          <button type="button" onClick={()=>{ setForm((c)=>({ ...c, route: [] })); }} className="rounded-full border px-4 py-2">Réinitialiser route</button>
+          <button type="submit" disabled={saving} className="rounded-full bg-brand-dark px-6 py-2 text-white font-bold">{saving ? 'Sauvegarde...' : 'Sauvegarder'}</button>
         </div>
       </form>
     </AdminShell>
   );
-}
 
-function Section({ title, action, children }) {
-  return (
-    <section className="rounded-[2rem] border border-brand-line bg-white p-5 shadow-premium">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <h2 className="text-xl font-extrabold text-brand-dark">{title}</h2>
-        {action}
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function Grid({ children }) {
-  return <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{children}</div>;
-}
-
-function Input({ 
-  label, 
-  value, 
-  onChange, 
-  onBlur,
-  type = 'text', 
-  required = false, 
-  step, 
-  placeholder 
-}) {
-  return (
-    <label className="block">
-      <span className="text-sm font-bold text-brand-graphite">{label}</span>
-      <input
-  type={type}
-  step={step}
-  value={value ?? ''}
-  onChange={(event) => onChange(event.target.value)}
-  onBlur={(event) => onBlur && onBlur(event.target.value)}
-  required={required}
-  placeholder={placeholder}
-  className="mt-2 h-12 w-full rounded-2xl border border-brand-line bg-white px-4 text-sm font-semibold outline-none transition focus:border-brand-red focus:ring-4 focus:ring-red-100"
-/>
-    </label>
-  );
-}
-
-function Select({ label, value, onChange, options }) {
-  return (
-    <label className="block">
-      <span className="text-sm font-bold text-brand-graphite">{label}</span>
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="mt-2 h-12 w-full rounded-2xl border border-brand-line bg-white px-4 text-sm font-semibold outline-none transition focus:border-brand-red focus:ring-4 focus:ring-red-100"
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
 }
