@@ -511,7 +511,7 @@ export default function OrderEditor(){
           <div className="grid gap-3 sm:grid-cols-2">
             <input className="p-3 rounded-lg border" placeholder="Navire" value={form.shipment.vesselName} onChange={(e)=>setField('shipment.vesselName', e.target.value)} />
             <input className="p-3 rounded-lg border" placeholder="Port de départ" value={form.shipment.departurePort} onChange={(e)=>setField('shipment.departurePort', e.target.value)} />
-            <select className="p-3 rounded-lg border" value={form.shipment.destinationPort} onChange={(e)=>{ setField('shipment.destinationPort', e.target.value); changeDestination(e.target.value); }}>
+            <select className="hidden" value={form.shipment.destinationPort} onChange={(e)=>{ setField('shipment.destinationPort', e.target.value); changeDestination(e.target.value); }} aria-hidden="true" tabIndex={-1}>
               <option value="">Choisir destination</option>
               <option value="Port Autonome de Lomé">Port Autonome de Lomé - Togo</option>
               <option value="Port de Banana">Port de Banana - RDC</option>
@@ -528,6 +528,20 @@ export default function OrderEditor(){
               <option value="Port de Coyah">Port de Coyah - Guinée</option>
               <option value="Port de Cotonou">Port de Cotonou - Bénin</option>
               <option value="Port de Sèmè-Podji">Port de Sèmè-Podji - Bénin</option>
+            </select>
+            <select
+              className="p-3 rounded-lg border"
+              value={form.shipment.destinationPort}
+              onChange={(e) => changeDestination(e.target.value)}
+            >
+              <option value="">Destination finale : tous les ports africains</option>
+              {availablePorts
+                .filter((port) => !port.region)
+                .map((port) => (
+                  <option key={port.name} value={port.name}>
+                    {port.name} - {port.country}
+                  </option>
+                ))}
             </select>
             <input className="p-3 rounded-lg border" placeholder="Pays destination" value={form.shipment.destinationCountry} onChange={(e)=>setField('shipment.destinationCountry', e.target.value)} />
             <input className="p-3 rounded-lg border" placeholder="Date départ" type="date" value={form.shipment.departureDate} onChange={(e)=>setField('shipment.departureDate', e.target.value)} />
