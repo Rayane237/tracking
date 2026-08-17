@@ -404,11 +404,10 @@ const portsToKeepAll = new Set([
   "Port Autonome de Lome",
 ]);
 
-const displayedCountries = new Set();
+// L'administration utilise la liste complète pour créer librement les trajets.
+export const ports = allPorts;
 
-export const ports = allPorts.filter((port) => {
-  if (portsToKeepAll.has(port.name)) return true;
-  if (displayedCountries.has(port.country)) return false;
-  displayedCountries.add(port.country);
-  return true;
-});
+// La carte de suivi client reste volontairement simple : un port par pays.
+export const clientPorts = allPorts.filter(
+  (port, index) => allPorts.findIndex((item) => item.country === port.country) === index
+);

@@ -1,7 +1,7 @@
 import L from "leaflet";
 import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Polyline, TileLayer, Popup } from "react-leaflet";
-import { ports as allPorts } from "../data/port.js";
+import { clientPorts } from "../data/port.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import http from "../api/http.js";
 
@@ -201,7 +201,7 @@ export default function RouteMap({ order }) {
   // Les ports africains connus restent visibles sur la carte du client.
   const africanPorts = useMemo(
     () =>
-      allPorts
+      clientPorts
         .filter(
           (port) =>
             !port.region &&
