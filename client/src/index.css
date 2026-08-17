@@ -29,10 +29,16 @@ body {
 }
 
 .leaflet-container {
-  min-height: 420px;
+  height: clamp(500px, 72vh, 680px);
   width: 100%;
   border-radius: 24px;
   font-family: Inter, system-ui, sans-serif;
+}
+
+@media (min-width: 768px) {
+  .leaflet-container {
+    height: 560px;
+  }
 }
 
 .map-marker {

@@ -305,7 +305,30 @@ export default function RouteMap({ order }) {
                 <div className="font-bold">{port.name}</div>
                 <div className="text-xs text-slate-600">{port.country}</div>
                 {/** show complete button for admins and when not already completed **/}
-                {user?.role === 'admin' && !port.completed && (
+                {user?.role === 'admin' && (
+                  <label className="mt-3 flex cursor-pointer items-center gap-2 text-xs font-bold text-brand-dark">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(port.completed)}
+                      onChange={async (event) => {
+                        try {
+                          const completed = event.target.checked;
+                          const newRoute = (order.route || []).map((routePort, routeIndex) =>
+                            routeIndex === index ? { ...routePort, completed } : routePort
+                          );
+                          await http.put(`/orders/${order._id}`, { route: newRoute });
+                          window.location.reload();
+                        } catch (err) {
+                          console.error(err);
+                          alert("Erreur lors de la mise a jour du statut.");
+                        }
+                      }}
+                      className="h-4 w-4 accent-emerald-600"
+                    />
+                    Etape terminee
+                  </label>
+                )}
+                {false && user?.role === 'admin' && !port.completed && (
                   <div className="mt-2">
                     <button
                       onClick={async () => {

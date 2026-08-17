@@ -652,6 +652,36 @@ export default function OrderEditor(){
                   >
                     Retirer
                   </button>
+                  <label className="flex cursor-pointer items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-brand-dark">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(step.completed)}
+                      onChange={async (event) => {
+                        const completed = event.target.checked;
+                        if (isEdit) {
+                          try {
+                            const newRoute = (form.route || []).map((routePort, routeIndex) =>
+                              routeIndex === idx ? { ...routePort, completed } : routePort
+                            );
+                            const { data } = await http.put(`/orders/${id}`, { route: newRoute });
+                            setForm(normalizeOrder(data.order));
+                          } catch (err) {
+                            console.error(err);
+                            alert("Erreur lors de la mise a jour de l'etape");
+                          }
+                        } else {
+                          setForm((current) => ({
+                            ...current,
+                            route: current.route.map((routePort, routeIndex) =>
+                              routeIndex === idx ? { ...routePort, completed } : routePort
+                            ),
+                          }));
+                        }
+                      }}
+                      className="h-4 w-4 accent-emerald-600"
+                    />
+                    Etape terminee
+                  </label>
                   <button
                     type="button"
                     onClick={async () => {
@@ -673,7 +703,7 @@ export default function OrderEditor(){
                         });
                       }
                     }}
-                    className={`rounded-full px-3 py-1 text-xs font-bold ${step.completed ? 'bg-emerald-200 text-emerald-800' : 'bg-brand-dark text-white'}`}
+                    className="hidden"
                   >
                     {step.completed ? 'Complété' : 'Marquer comme complété'}
                   </button>

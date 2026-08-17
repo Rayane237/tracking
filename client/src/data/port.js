@@ -1,4 +1,4 @@
-export const ports = [
+const allPorts = [
 
   // =========================
   // DEPART DUBAI
@@ -372,3 +372,43 @@ export const ports = [
   { name: "Port de Tunis", country: "Tunisie", coordinates: { lat: 36.819, lng: 10.305 } },
   { name: "Port de Tripoli", country: "Libye", coordinates: { lat: 32.887, lng: 13.191 } }
 ];
+
+// Une seule destination proposée pour la RDC, la Guinée, la Côte d'Ivoire et le Togo.
+const portsToHide = new Set([
+  "Port de Boma",
+  "Port de Matadi",
+  "Port de Kinshasa",
+  "Port de Kisangani",
+  "Port de Kamsar",
+  "Port de Boké",
+  "Port de Sangarédi",
+  "Port de Coyah (terminal proche Conakry)",
+  "Port de San-Pedro",
+  "Port de Sassandra",
+]);
+
+const portsToKeepAll = new Set([
+  "Port de Banana",
+  "Port de Boma",
+  "Port de Matadi",
+  "Port de Kinshasa",
+  "Port de Kisangani",
+  "Port d'Abidjan",
+  "Port de San-Pedro",
+  "Port de Sassandra",
+  "Port autonome de Conakry",
+  "Port de Kamsar",
+  "Port de Boké",
+  "Port de Sangarédi",
+  "Port de Coyah (terminal proche Conakry)",
+  "Port Autonome de Lome",
+]);
+
+const displayedCountries = new Set();
+
+export const ports = allPorts.filter((port) => {
+  if (portsToKeepAll.has(port.name)) return true;
+  if (displayedCountries.has(port.country)) return false;
+  displayedCountries.add(port.country);
+  return true;
+});
