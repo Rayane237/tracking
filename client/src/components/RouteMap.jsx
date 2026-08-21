@@ -209,13 +209,14 @@ export default function RouteMap({ order }) {
             port.coordinates.lat !== "" &&
             port.coordinates.lng !== "" &&
             !Number.isNaN(Number(port.coordinates.lat)) &&
-            !Number.isNaN(Number(port.coordinates.lng))
+            !Number.isNaN(Number(port.coordinates.lng)) &&
+            !ports.some((routePort) => routePort.name === port.name)
         )
         .map((port) => ({
           ...port,
           position: [Number(port.coordinates.lat), Number(port.coordinates.lng)],
         })),
-    []
+    [ports]
   );
 
   const routePoints = ports.map((port) => port.position);
