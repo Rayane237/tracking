@@ -413,11 +413,6 @@ const allowedClientPorts = new Set([
   'Port de Djibouti',
   'Port de Berbera',
   'Port de Mombasa',
-  'Port de Maputo',
-  'Port de Beira',
-  'Port de Durban',
-  'Port Elizabeth',
-  'Port du Cap',
   'Port de Pointe-Noire',
   'Port de Libreville',
   'Port de Banana',
@@ -427,7 +422,6 @@ const allowedClientPorts = new Set([
   'Port de Kisangani',
   'Port de Kribi',
   'Port de Douala',
-  'Port de Tema',
   'Port d\'Abidjan',
   'Port de San-Pedro',
   'Port de Sassandra',
@@ -439,9 +433,8 @@ const allowedClientPorts = new Set([
   'Port de Dakar',
   'Port Autonome de Lome',
   'Port de Cotonou',
-  'Port de Port Harcourt',
-  'Port de Calabar',
-  'Port de Sao Tome',
+  'Port de Tema',
+  'Port de Sao Tome'
 ]);
 
 export const clientPorts = allPorts.filter((port) => allowedClientPorts.has(port.name));
