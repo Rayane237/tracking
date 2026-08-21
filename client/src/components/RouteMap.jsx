@@ -259,7 +259,7 @@ export default function RouteMap({ order }) {
           <Polyline
             positions={createSeaRoute(remainingRoutePoints)}
             pathOptions={{
-              color: "#f59e0b",
+              color: "#2563eb",
               weight: 4,
               opacity: 0.9,
               dashArray: "10 8",

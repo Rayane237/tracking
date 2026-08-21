@@ -411,17 +411,11 @@ export const ports = allPorts;
 const allowedClientPorts = new Set([
   'Port de Jebel Ali',
   'Port de Djibouti',
-  'Port de Berbera',
-  'Port de Mombasa',
-  'Port de Pointe-Noire',
-  'Port de Libreville',
   'Port de Banana',
   'Port de Boma',
   'Port de Matadi',
   'Port de Kinshasa',
   'Port de Kisangani',
-  'Port de Kribi',
-  'Port de Douala',
   'Port d\'Abidjan',
   'Port de San-Pedro',
   'Port de Sassandra',
@@ -432,7 +426,6 @@ const allowedClientPorts = new Set([
   'Port de Coyah (terminal proche Conakry)',
   'Port de Dakar',
   'Port Autonome de Lome',
-  'Port de Cotonou',
   'Port de Tema',
   'Port de Sao Tome'
 ]);
