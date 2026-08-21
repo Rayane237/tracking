@@ -300,24 +300,8 @@ export default function OrderEditor(){
 
 
   function addPortToRoute() {
-    const port = availablePorts.find((item) => item.name === selectedPort);
-    if (!port) return;
-
-    setForm((current) => ({
-      ...current,
-      route: [
-        ...(current.route || []),
-        {
-          name: port.name,
-          country: port.country,
-          coordinates: {
-            lat: Number(port.coordinates.lat),
-            lng: Number(port.coordinates.lng),
-          },
-          completed: false,
-        },
-      ],
-    }));
+    // The route must follow the selected destination automatically.
+    // Manual port insertion is disabled to avoid duplicate or inconsistent stops.
     setSelectedPort("");
   }
 
@@ -624,13 +608,17 @@ export default function OrderEditor(){
 
         <section className="rounded-[1rem] border bg-white p-4">
           <h3 className="font-extrabold mb-3">Ports et escales (étapes)</h3>
+          <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+            La route suit automatiquement la destination sélectionnée. Les ports ne sont pas ajoutés manuellement.
+          </div>
           <div className="mb-4 flex flex-col gap-3 sm:flex-row">
             <select
-              className="min-w-0 flex-1 rounded-lg border p-3"
+              className="min-w-0 flex-1 rounded-lg border p-3 opacity-70"
               value={selectedPort}
               onChange={(e) => setSelectedPort(e.target.value)}
+              disabled
             >
-              <option value="">Choisir un port a ajouter au trajet</option>
+              <option value="">Trajet généré automatiquement</option>
               {availablePorts.map((port) => (
                 <option key={port.name} value={port.name}>
                   {port.name} - {port.country}
@@ -640,10 +628,10 @@ export default function OrderEditor(){
             <button
               type="button"
               onClick={addPortToRoute}
-              disabled={!selectedPort}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-dark px-4 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              disabled
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-200 px-4 py-3 font-bold text-slate-500 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <Plus size={18} /> Ajouter l'escale
+              <Plus size={18} /> Ajout automatique
             </button>
           </div>
           <div className="space-y-3">
