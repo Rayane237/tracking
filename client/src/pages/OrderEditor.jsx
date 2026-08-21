@@ -225,32 +225,7 @@ export default function OrderEditor(){
     const baseRoute = Array.isArray(seaRoutes['Jebel Ali-Base']) ? seaRoutes['Jebel Ali-Base'] : [];
     const destinationPoints = key ? (Array.isArray(seaRoutes[key]) ? seaRoutes[key] : [seaRoutes[key]]) : [];
 
-    const destinationLabel = destination || '';
-    const isCongoDestination = destinationLabel.toLowerCase().includes('congo') ||
-      ['Port de Boma', 'Port de Matadi', 'Port de Kinshasa'].some((stop) => destinationLabel.includes(stop));
-
     const routeItems = [...baseRoute, ...destinationPoints];
-
-    if (isCongoDestination) {
-      const finalCongoPorts = ['Port de Boma', 'Port de Matadi', 'Port de Kinshasa'];
-      const finalCongoPoints = finalCongoPorts
-        .map((stopName) => {
-          const portInfo = availablePorts.find((port) => port.name === stopName);
-          if (!portInfo) return null;
-          return {
-            name: portInfo.name,
-            country: portInfo.country,
-            coordinates: {
-              lat: Number(portInfo.coordinates.lat),
-              lng: Number(portInfo.coordinates.lng),
-            },
-          };
-        })
-        .filter(Boolean);
-
-      const dedupedFinalPorts = finalCongoPoints.filter((point) => !routeItems.some((existing) => existing.name === point.name));
-      routeItems.push(...dedupedFinalPorts);
-    }
 
     const dedupedRoute = [];
     const seen = new Set();
