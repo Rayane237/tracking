@@ -388,11 +388,9 @@ const portsToHide = new Set([
 ]);
 
 const portsToKeepAll = new Set([
-  "Port de Banana",
   "Port de Boma",
   "Port de Matadi",
   "Port de Kinshasa",
-  "Port de Kisangani",
   "Port d'Abidjan",
   "Port de San-Pedro",
   "Port de Sassandra",
