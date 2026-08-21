@@ -407,7 +407,41 @@ const portsToKeepAll = new Set([
 // L'administration utilise la liste complète pour créer librement les trajets.
 export const ports = allPorts;
 
-// La carte de suivi client reste volontairement simple : un port par pays.
-export const clientPorts = allPorts.filter(
-  (port, index) => allPorts.findIndex((item) => item.country === port.country) === index
-);
+// La carte de suivi client reste volontairement simple : on garde uniquement les ports utiles au trajet Jebel Ali -> Afrique de l'Ouest / centrale.
+const allowedClientPorts = new Set([
+  'Port de Jebel Ali',
+  'Port de Djibouti',
+  'Port de Berbera',
+  'Port de Mombasa',
+  'Port de Maputo',
+  'Port de Beira',
+  'Port de Durban',
+  'Port Elizabeth',
+  'Port du Cap',
+  'Port de Pointe-Noire',
+  'Port de Libreville',
+  'Port de Banana',
+  'Port de Boma',
+  'Port de Matadi',
+  'Port de Kinshasa',
+  'Port de Kisangani',
+  'Port de Kribi',
+  'Port de Douala',
+  'Port de Tema',
+  'Port d\'Abidjan',
+  'Port de San-Pedro',
+  'Port de Sassandra',
+  'Port autonome de Conakry',
+  'Port de Kamsar',
+  'Port de Boké',
+  'Port de Sangarédi',
+  'Port de Coyah (terminal proche Conakry)',
+  'Port de Dakar',
+  'Port Autonome de Lome',
+  'Port de Cotonou',
+  'Port de Port Harcourt',
+  'Port de Calabar',
+  'Port de Sao Tome',
+]);
+
+export const clientPorts = allPorts.filter((port) => allowedClientPorts.has(port.name));
