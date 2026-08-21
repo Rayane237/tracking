@@ -11,6 +11,7 @@
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "axios": "^1.7.9",
+    "dubai-global-express-tracking": "file:..",
     "framer-motion": "^11.15.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.468.0",
@@ -26,4 +27,3 @@
     "vite": "^6.0.5"
   }
 }
-

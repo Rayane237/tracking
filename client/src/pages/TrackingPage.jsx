@@ -27,17 +27,31 @@ export default function TrackingPage() {
         fetched.shipment?.destinationPort
       ) {
         const dest = fetched.shipment.destinationPort;
-        const clean = dest.trim().toLowerCase();
+        const clean = String(dest).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
         let key = "";
 
-        if (clean.includes("lome") || clean.includes("lomé")) key = "Jebel Ali-Lome";
-        else if (clean.includes("banana")) key = "Jebel Ali-Banana";
-        else if (clean.includes("boma")) key = "Jebel Ali-Boma";
-        else if (clean.includes("matadi")) key = "Jebel Ali-Matadi";
-        else if (clean.includes("kinshasa")) key = "Jebel Ali-Kinshasa";
+        if (clean.includes("lome")) key = "Lome";
+        else if (clean.includes("banana")) key = "Banana";
+        else if (clean.includes("boma")) key = "Boma";
+        else if (clean.includes("matadi")) key = "Matadi";
+        else if (clean.includes("kinshasa")) key = "Kinshasa";
+        else if (clean.includes("abidjan")) key = "Abidjan";
+        else if (clean.includes("san-pedro") || clean.includes("sanpedro") || clean.includes("san pedro")) key = "San-Pedro";
+        else if (clean.includes("sassandra")) key = "Sassandra";
+        else if (clean.includes("conakry")) key = "Conakry";
+        else if (clean.includes("kamsar")) key = "Kamsar";
+        else if (clean.includes("boke")) key = "Boke";
+        else if (clean.includes("sangaredi")) key = "Sangaredi";
+        else if (clean.includes("coyah")) key = "Coyah";
+        else if (clean.includes("cotonou")) key = "Cotonou";
+        else if (clean.includes("seme") || clean.includes("seme-podji") || clean.includes("semepodji")) key = "Seme-Podji";
 
-        fetched.route = (seaRoutes[key] || []).map(point => ({
+        const finalDestination = seaRoutes[key];
+        const baseRoute = Array.isArray(seaRoutes['Jebel Ali-Base']) ? seaRoutes['Jebel Ali-Base'] : [];
+        const destinationPoints = finalDestination ? (Array.isArray(finalDestination) ? finalDestination : [finalDestination]) : [];
+
+        fetched.route = [...baseRoute, ...destinationPoints].map(point => ({
           name: point.name,
           country: point.country,
           coordinates: {

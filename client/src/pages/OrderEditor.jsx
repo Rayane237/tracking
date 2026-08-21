@@ -204,60 +204,38 @@ export default function OrderEditor(){
 
   function changeDestination(destination){
     const selected = availablePorts.find((port) => port.name === destination);
-    setForm((current) => ({
-      ...current,
-      shipment: {
-        ...current.shipment,
-        destinationPort: destination,
-        destinationCountry: selected?.country || current.shipment.destinationCountry,
-      },
-    }));
-    return;
 
-    const clean = destination.trim().toLowerCase();
+    const clean = String(destination).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
     let key = '';
 
-    if (clean.includes('lome') || clean.includes('lomé')) key = 'Lome';
+    if (clean.includes('lome')) key = 'Lome';
     else if (clean.includes('banana')) key = 'Banana';
     else if (clean.includes('boma')) key = 'Boma';
     else if (clean.includes('matadi')) key = 'Matadi';
     else if (clean.includes('kinshasa')) key = 'Kinshasa';
-
-    // Côte d'Ivoire
     else if (clean.includes('abidjan')) key = 'Abidjan';
-    else if (clean.includes('san') || clean.includes('san-pedro') || clean.includes('sanpedro')) key = 'San-Pedro';
+    else if (clean.includes('san-pedro') || clean.includes('sanpedro') || clean.includes('san pedro')) key = 'San-Pedro';
     else if (clean.includes('sassandra')) key = 'Sassandra';
-
-    // Guinée
     else if (clean.includes('conakry')) key = 'Conakry';
     else if (clean.includes('kamsar')) key = 'Kamsar';
-    else if (clean.includes('bok') || clean.includes('boke')) key = 'Boke';
-    else if (clean.includes('sangar') || clean.includes('sangaredi')) key = 'Sangaredi';
+    else if (clean.includes('boke')) key = 'Boke';
+    else if (clean.includes('sangaredi')) key = 'Sangaredi';
     else if (clean.includes('coyah')) key = 'Coyah';
-
-    // Bénin
     else if (clean.includes('cotonou')) key = 'Cotonou';
-    else if (clean.includes('seme') || clean.includes('s%C3%A8me') || clean.includes('s%C3%A8me-podji')) key = 'Seme-Podji';
+    else if (clean.includes('seme') || clean.includes('seme-podji') || clean.includes('semepodji')) key = 'Seme-Podji';
 
-    const finalDestination = seaRoutes[key];
+    const finalDestination = key ? seaRoutes[key] : null;
+    const baseRoute = Array.isArray(seaRoutes['Jebel Ali-Base']) ? seaRoutes['Jebel Ali-Base'] : [];
+    const destinationPoints = finalDestination ? (Array.isArray(finalDestination) ? finalDestination : [finalDestination]) : [];
 
-    if (!finalDestination) return;
-
-    // build route: base + destination (Jebel Ali-Base has 9 points, plus destination = 10)
-    let route = [];
-    if (Array.isArray(finalDestination)) route = [...seaRoutes['Jebel Ali-Base'], ...finalDestination];
-    else route = [...seaRoutes['Jebel Ali-Base'], finalDestination];
-
-    // format compatible backend
-    route = route.map((point) => ({
+    const route = [...baseRoute, ...destinationPoints].map((point) => ({
       name: point.name || '',
       country: point.country || 'International',
       coordinates: { lat: Number(point.coordinates.lat), lng: Number(point.coordinates.lng) },
       completed: Boolean(point.completed),
     }));
 
-    // attempt to infer country for destination when not provided
     const countriesByKey = {
       Lome: 'Togo',
       Banana: 'République Démocratique du Congo',
@@ -276,14 +254,15 @@ export default function OrderEditor(){
       'Seme-Podji': 'Bénin',
     };
 
-    const country = countriesByKey[key] || 'International';
-
     setForm((current) => ({
       ...current,
-      shipment: { ...current.shipment, destinationPort: destination, destinationCountry: country },
+      shipment: {
+        ...current.shipment,
+        destinationPort: destination,
+        destinationCountry: selected?.country || countriesByKey[key] || current.shipment.destinationCountry,
+      },
       route,
     }));
-
   }
 
 
