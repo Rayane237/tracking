@@ -202,13 +202,10 @@ export default function OrderEditor(){
 
 
 
-  function changeDestination(destination){
-    const selected = availablePorts.find((port) => port.name === destination);
-
+  function buildRouteFromDestination(destination) {
     const clean = String(destination).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
     let key = '';
-
     if (clean.includes('lome')) key = 'Lome';
     else if (clean.includes('banana')) key = 'Banana';
     else if (clean.includes('boma')) key = 'Boma';
@@ -225,16 +222,70 @@ export default function OrderEditor(){
     else if (clean.includes('cotonou')) key = 'Cotonou';
     else if (clean.includes('seme') || clean.includes('seme-podji') || clean.includes('semepodji')) key = 'Seme-Podji';
 
-    const finalDestination = key ? seaRoutes[key] : null;
     const baseRoute = Array.isArray(seaRoutes['Jebel Ali-Base']) ? seaRoutes['Jebel Ali-Base'] : [];
-    const destinationPoints = finalDestination ? (Array.isArray(finalDestination) ? finalDestination : [finalDestination]) : [];
+    const destinationPoints = key ? (Array.isArray(seaRoutes[key]) ? seaRoutes[key] : [seaRoutes[key]]) : [];
 
-    const route = [...baseRoute, ...destinationPoints].map((point) => ({
+    const congoStops = ['Port de Banana', 'Port de Boma', 'Port de Matadi', 'Port de Kinshasa'];
+    const destinationLabel = destination || '';
+    const extraStops =
+      destinationLabel.toLowerCase().includes('congo') ||
+      congoStops.some((stop) => destinationLabel.includes(stop))
+        ? congoStops
+        : [];
+
+    const routeItems = [...baseRoute, ...destinationPoints, ...extraStops
+      .map((stopName) => {
+        const portInfo = availablePorts.find((port) => port.name === stopName);
+        if (!portInfo) return null;
+        return {
+          name: portInfo.name,
+          country: portInfo.country,
+          coordinates: {
+            lat: Number(portInfo.coordinates.lat),
+            lng: Number(portInfo.coordinates.lng),
+          },
+        };
+      })
+      .filter(Boolean)];
+
+    const dedupedRoute = [];
+    const seen = new Set();
+    routeItems.forEach((point) => {
+      const signature = `${point.name}-${point.coordinates?.lat}-${point.coordinates?.lng}`;
+      if (!seen.has(signature)) {
+        seen.add(signature);
+        dedupedRoute.push(point);
+      }
+    });
+
+    return dedupedRoute.map((point) => ({
       name: point.name || '',
       country: point.country || 'International',
       coordinates: { lat: Number(point.coordinates.lat), lng: Number(point.coordinates.lng) },
       completed: Boolean(point.completed),
     }));
+  }
+
+  function changeDestination(destination){
+    const selected = availablePorts.find((port) => port.name === destination);
+    const clean = String(destination).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    let key = '';
+    if (clean.includes('lome')) key = 'Lome';
+    else if (clean.includes('banana')) key = 'Banana';
+    else if (clean.includes('boma')) key = 'Boma';
+    else if (clean.includes('matadi')) key = 'Matadi';
+    else if (clean.includes('kinshasa')) key = 'Kinshasa';
+    else if (clean.includes('abidjan')) key = 'Abidjan';
+    else if (clean.includes('san-pedro') || clean.includes('sanpedro') || clean.includes('san pedro')) key = 'San-Pedro';
+    else if (clean.includes('sassandra')) key = 'Sassandra';
+    else if (clean.includes('conakry')) key = 'Conakry';
+    else if (clean.includes('kamsar')) key = 'Kamsar';
+    else if (clean.includes('boke')) key = 'Boke';
+    else if (clean.includes('sangaredi')) key = 'Sangaredi';
+    else if (clean.includes('coyah')) key = 'Coyah';
+    else if (clean.includes('cotonou')) key = 'Cotonou';
+    else if (clean.includes('seme') || clean.includes('seme-podji') || clean.includes('semepodji')) key = 'Seme-Podji';
 
     const countriesByKey = {
       Lome: 'Togo',
@@ -253,6 +304,8 @@ export default function OrderEditor(){
       Cotonou: 'Bénin',
       'Seme-Podji': 'Bénin',
     };
+
+    const route = buildRouteFromDestination(destination);
 
     setForm((current) => ({
       ...current,
